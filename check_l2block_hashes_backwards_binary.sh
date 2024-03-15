@@ -3,19 +3,7 @@
 source $(dirname $0)/lib/ansi.sh
 COLOR_RPC1=$LIGHTWHITE
 COLOR_RPC2=$LIGHTYELLOW
-# CONFIGURATIONS
-############################ MAINNET
-RPC_MAINNET_TRUSTED=https://zkevm-rpc.com/
-RPC_MAINNET_PLESS1=http://34.175.231.220:8545
-RPC_MAINNET_PLESS2=http://34.175.237.141:8545
-RPC_MAINNET_PLESS4=http://34.175.10.246:8545/
-RPC_MAINNET_PLESS5=http://34.175.67.96:8545
-RPC_MAINNET_PLESS6=http://34.175.164.151:8545
-RPC_MAINNET_PARTNER1=https://polygon-zkevm-a.cryptomanufaktur.net/
-############################## CARDONA - TESTNET(SEPOLIA)
-RPC_CARDONA_TRUSTED=https://rpc.cardona.zkevm-rpc.com/
-RPC_CARDONA_PLESS2=https://permissionless2.zkevm-testnet.com/
-
+PARAMETERS_FILE=$(dirname $0)/parameters.sh
 
 ###############################################################################
 # check_l2block(BLOCK_NUMBER)
@@ -148,13 +136,24 @@ function generic_check_error()
 ###############################################################################
 set -o pipefail # enable strict command pipe error detection
 down=1
+if [ -f $PARAMETERS_FILE ]; then
+	# Load the configuration, must define RPC1 and RPC2 variables to avoid putting in command line
+	echo "Imporing parameters from $PARAMETERS_FILE"
+	source $PARAMETERS_FILE
+fi
 # Get RPC1 and RPC2 from command line
-RPC1=$1
-RPC2=$2
+if [ ! -z $1 ]; then
+	RPC1=$1
+fi
+if [ ! -z $2 ]; then
+	RPC2=$2
+fi
+
+
 if [ -z $RPC1 ] || [ -z $RPC2 ]; then
 	echo "Usage: $0 <RPC1> <RPC2>"
 	echo " "
-	echo "Example: $0 $RPC_MAINNET_TRUSTED $RPC_MAINNET_PLESS1"
+	echo "Example: $0  https://zkevm-rpc.com/ <url for your node>"
 	exit 1
 fi
 
